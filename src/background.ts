@@ -1,7 +1,9 @@
 let isFocusMode = false;
 let blockList: string[] = [];
-let intervalId: number | null = null;
+let intervalId: ReturnType<typeof setInterval> | null = null;
 
+
+let numberRuleId = 1;
 
 function startTimer(endTime: number) {
     if (intervalId) {
@@ -29,12 +31,26 @@ function startBlocking() {
         if (blockList.length && Date.now() < endTime) {
             isFocusMode = true;
 
-            // block the incoming requests from the blocked sites
-            chrome.webRequest.onBeforeRequest.addListener(
-                blockRequest,
-                { urls: blockList.map(site => `*://*.${site}/*`) },
-                ["blocking"]
-            );
+            //generate the new rules
+            const rules = blockList.map((site) => ({
+                id: numberRuleId++, // Unique numeric rule ID
+                priority: 1,
+                action: {
+                    type: "redirect",
+                    redirect: {
+                        regex: ".*", // Matches all URLs
+                        url: chrome.runtime.getURL("blocked.html") // Redirect to blocked.html
+                    }
+                },
+                condition: {
+                    urlFilter: `*://*.${site}/*`, // Block requests to the site
+                    resourceTypes: ["main_frame"] // Only block main frame requests
+                }
+            }));
+
+            chrome.declarativeNetRequest.updateDynamicRules({
+                addRules: rules
+            });
 
             // start the timer
             startTimer(endTime);
@@ -42,8 +58,8 @@ function startBlocking() {
     });
 }
 
-function blockRequest(details: chrome.webRequest.WebRequestBodyDetails): chrome.webRequest.BlockingResponse{
-    return {redirectUrl: chrome.runtime.getURL("blocked.html")};
+function blockRequest(details: chrome.webRequest.WebRequestBodyDetails): chrome.webRequest.BlockingResponse {
+    return { redirectUrl: chrome.runtime.getURL("blocked.html") };
 }
 
 
@@ -51,8 +67,7 @@ function stopBlocking() {
 
     isFocusMode = false;
 
-    if(intervalId)
-    {
+    if (intervalId) {
         clearInterval(intervalId);
         intervalId = null;
     }
@@ -60,23 +75,25 @@ function stopBlocking() {
 
     // Remove the blocking service
 
-    chrome.webRequest.onBeforeRequest.removeListener(blockRequest);
+    chrome.declarativeNetRequest.updateDynamicRules({
+        removeRuleIds: blockList.map((_, id) => id + 1)
+    });
 
     // Clear storage
 
-    chrome.storage.local.remove(["blockList","endTime"]);
+    chrome.storage.local.remove(["blockList", "endTime"]);
     console.log("Focus mode had ended");
 }
 
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if(request.action === "startFocusMode")
+    if (request.action === "startFocusMode")
         startBlocking();
 });
 
 
 chrome.alarms.onAlarm.addListener((alarm) => {
-    if(alarm.name === 'endFocusMode')
+    if (alarm.name === 'endFocusMode')
         stopBlocking()
 })
 

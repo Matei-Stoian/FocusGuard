@@ -1,0 +1,27 @@
+# Node.js dependencies
+node_modules/
+
+# Compiled JavaScript files
+dist/
+
+# TypeScript declaration files
+*.d.ts
+
+# Logs
+*.log
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# IDE/Editor specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# NPM package lock file (optional)
+package-lock.json
+
+# Environment files
+.env

@@ -72,7 +72,6 @@ function stopBlocking() {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if(request.action === "startFocusMode")
         startBlocking();
-
 });
 
 

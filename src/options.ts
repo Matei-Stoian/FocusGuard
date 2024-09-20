@@ -1,5 +1,5 @@
 const blockListElement = document.getElementById("blockList") as HTMLUListElement;
-const newSiteInput = document.getElementById("newInput") as HTMLInputElement;
+const newSiteInput = document.getElementById("newSite") as HTMLInputElement;
 const addSiteButton = document.getElementById("addSite") as HTMLButtonElement;
 
 document.addEventListener("DOMContentLoaded", () => {

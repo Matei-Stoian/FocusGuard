@@ -31,12 +31,16 @@ function startBlocking() {
         if (blockList.length && Date.now() < endTime) {
             isFocusMode = true;
 
+
+
+
+
             //generate the new rules
-            const rules = blockList.map((site) => ({
+            const rules:chrome.declarativeNetRequest.Rule[] = blockList.map((site) => ({
                 id: numberRuleId++, // Unique numeric rule ID
                 priority: 1,
                 action: {
-                    type: "redirect",
+                    type: chrome.declarativeNetRequest.RuleActionType.REDIRECT,
                     redirect: {
                         regex: ".*", // Matches all URLs
                         url: chrome.runtime.getURL("blocked.html") // Redirect to blocked.html
@@ -44,7 +48,7 @@ function startBlocking() {
                 },
                 condition: {
                     urlFilter: `*://*.${site}/*`, // Block requests to the site
-                    resourceTypes: ["main_frame"] // Only block main frame requests
+                    resourceTypes: [chrome.declarativeNetRequest.ResourceType.MAIN_FRAME] // Only block main frame requests
                 }
             }));
 

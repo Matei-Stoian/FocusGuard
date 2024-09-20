@@ -1,8 +1,57 @@
 body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-  }
-  
-  button {
-    margin-top: 10px;
-  }
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #001F3F;
+}
+
+button {
+  margin-top: 10px;
+  color: #EAD8B1;
+  text-align: center;
+  margin-bottom: 20px;
+  background-color: #3A6D8C;
+  border: 1px solid #ccc;
+}
+
+h1 {
+  color: #EAD8B1;
+}
+
+input[type="number"] {
+  width: 250px;
+  /* Full width */
+  padding: 10px;
+  /* Spacing inside the input */
+  font-size: 16px;
+  /* Font size for text */
+  border: 1px solid #ccc;
+  /* Light border */
+  border-radius: 8px;
+  /* Rounded corners */
+  outline: none;
+  /* Remove the default blue outline */
+  background-color: #3A6D8C;
+  /* White background */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* Subtle shadow */
+  transition: box-shadow 0.3s ease;
+  /* Smooth hover transition */
+  margin-bottom: 15px;
+  /* Add spacing below the input */
+}
+
+input[type="number"]:hover,
+input[type="number"]:focus {
+  border-color: #007BFF;
+  /* Blue border on hover/focus */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  /* Slightly larger shadow */
+}
+
+p {
+  color: #EAD8B1;
+}
+
+label {
+  color: #EAD8B1;
+}

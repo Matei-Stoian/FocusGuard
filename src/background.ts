@@ -10,6 +10,11 @@ function startTimer(endTime: number) {
         clearInterval(intervalId);
     }
 
+    // Debug rules and check
+    const currentRules = chrome.declarativeNetRequest.getDynamicRules((rules) => {
+        console.log(rules);
+    });
+
     intervalId = setInterval(() => {
         const curentTime = Date.now()
         const remainingTime = endTime - curentTime
@@ -24,6 +29,7 @@ function startTimer(endTime: number) {
 
 
 function startBlocking() {
+    numberRuleId = 1;
     chrome.storage.local.get(["blockList", "endTime"], (data) => {
         blockList = data.blockList || [];
         const endTime = data.endTime || 0;
@@ -36,24 +42,28 @@ function startBlocking() {
 
 
             //generate the new rules
-            const rules:chrome.declarativeNetRequest.Rule[] = blockList.map((site) => ({
-                id: numberRuleId++, // Unique numeric rule ID
+            const rules:chrome.declarativeNetRequest.Rule[] = blockList.map((site) => {{
+                
+                let cleanSite = site.replace(/^https?:\/\//, '') // Remove protocol
+                cleanSite = cleanSite.replace(/\/.*$/, '') // Remove any path
+                cleanSite = cleanSite.replace(/^[^.]+\./, '');
+                return {id: numberRuleId++, // Unique numeric rule ID
                 priority: 1,
                 action: {
                     type: chrome.declarativeNetRequest.RuleActionType.REDIRECT,
                     redirect: {
-                        regex: ".*", // Matches all URLs
                         url: chrome.runtime.getURL("blocked.html") // Redirect to blocked.html
                     }
                 },
                 condition: {
-                    urlFilter: `*://*.${site}/*`, // Block requests to the site
+                    urlFilter: `*://*.${cleanSite}/*`, // Block requests to the site
                     resourceTypes: [chrome.declarativeNetRequest.ResourceType.MAIN_FRAME] // Only block main frame requests
                 }
-            }));
+            }}});
 
             chrome.declarativeNetRequest.updateDynamicRules({
-                addRules: rules
+                addRules: rules,
+                removeRuleIds: []
             });
 
             // start the timer
@@ -85,8 +95,13 @@ function stopBlocking() {
 
     // Clear storage
 
-    chrome.storage.local.remove(["blockList", "endTime"]);
+    chrome.storage.local.remove(["endTime"]);
     console.log("Focus mode had ended");
+
+    // Check the rules at the end
+    chrome.declarativeNetRequest.getDynamicRules((rules) => {
+        console.log(rules);
+    })
 }
 
 

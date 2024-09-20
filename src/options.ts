@@ -32,6 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    loadBlockList();
+
     addSiteButton.addEventListener('click',()=>{
         const newSite = newSiteInput.value.trim();
         if (newSite){

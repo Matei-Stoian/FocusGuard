@@ -1,9 +1,48 @@
 
 const startButton = document.getElementById('startFocus') as HTMLButtonElement;
 const durationInput = document.getElementById('duration') as HTMLInputElement;
+const optionLink = document.getElementById('options-link') as HTMLLinkElement | null;
+const remainingTime = document.getElementById('remaining-time') as HTMLParagraphElement;
+const stopFocusButton = document.getElementById('stopFocus') as HTMLButtonElement;
+function updateRemaingTime(){
+chrome.storage.local.get(['endTime'],(data) =>{
+    const endTime = data.endTime || 0;
+    const curentTime = Date.now();
 
 
+    const rTime = endTime - curentTime;
+    if(rTime > 0)
+    {
+        const remainingMinutest = Math.ceil(rTime / 60000);
+       
+        stopFocusButton.style.display = 'block';
+    }else{
+        
+        stopFocusButton.style.display = 'none';
+    }
+})
+}
 document.addEventListener("DOMContentLoaded",function() {
+    updateRemaingTime();   
+    if(optionLink)
+    {
+        optionLink.addEventListener('click',()=>{chrome.runtime.openOptionsPage()})
+    }
+    
+
+
+    // Stop the focus mode
+    stopFocusButton.addEventListener('click', ()=>{
+        chrome.storage.local.remove('endTime',()=>{
+            console.log("Focus mode stopped.");
+            stopFocusButton.style.display = 'none';
+            chrome.alarms.create("endFocusMode",{when: Date.now()});
+        })
+    })
+
+
+
+    // Start the focus mode
     startButton.addEventListener('click',()=>{
         const duration = parseInt(durationInput.value,10);
         if(isNaN(duration) || duration <= 0){
@@ -24,9 +63,6 @@ document.addEventListener("DOMContentLoaded",function() {
             chrome.alarms.create("endFocusMode",{when: endTime});
         })
 
-
-        // Close the popup
-        window.close();
 
     })
 });

@@ -11,7 +11,7 @@ function startTimer(endTime: number) {
     }
 
     // Debug rules and check
-    const currentRules = chrome.declarativeNetRequest.getDynamicRules((rules) => {
+    chrome.declarativeNetRequest.getDynamicRules((rules) => {
         console.log(rules);
     });
 
